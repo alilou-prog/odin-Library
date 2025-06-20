@@ -1,6 +1,7 @@
 const my_library = []
 const form = document.querySelector("form.new-book");
 const add_dialog = document.querySelector("dialog.new-book");
+const book_table_body = document.querySelector(".book-table > tbody");
 
 function Book(name, author) {
     if (!new.target) {
@@ -15,7 +16,17 @@ function add_book_to_lib(name, author) {
 }
 
 function print_books() {
-    console.table(my_library.map((v) => { return { id: v.id, ...v.book } }));
+    my_library.forEach((v)=> new_book_row({ id: v.id, ...v.book }));
+}
+
+function new_book_row(book) {
+    const tr = document.createElement("tr");
+    Object.keys(book).forEach(key => {
+        const td = document.createElement("td");
+        td.textContent = book[key];
+        tr.appendChild(td);
+    })
+    book_table_body.appendChild(tr);
 }
 
 function feed() {
