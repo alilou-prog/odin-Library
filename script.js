@@ -1,4 +1,6 @@
 const my_library = []
+const form = document.querySelector("form.new-book");
+const add_dialog = document.querySelector("dialog.new-book");
 
 function Book(name, author) {
     if (!new.target) {
@@ -13,7 +15,7 @@ function add_book_to_lib(name, author) {
 }
 
 function print_books() {
-    console.table(my_library.map((v)=>{return {id: v.id, ...v.book}}));
+    console.table(my_library.map((v) => { return { id: v.id, ...v.book } }));
 }
 
 function feed() {
@@ -26,6 +28,16 @@ function feed() {
 
 function init() {
     feed();
+    const add_btn = document.querySelector("button.new-book");
+    add_btn.addEventListener("click", () => {
+        add_dialog.showModal();
+    })
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const data = new FormData(e.target);
+        add_book_to_lib(data.get("name"), data.get("author"));
+        add_dialog.close();
+    })
 }
 
-document.addEventListener("DOMContentLoaded", ()=>{init();})
+document.addEventListener("DOMContentLoaded", () => { init(); })
