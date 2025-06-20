@@ -17,7 +17,8 @@ const btns = [{ label: "Delete", class: "btn-del" }, { label: "set is_read", cla
 const cols = keys.concat(btns.map((v) => v.label));
 
 function add_book_to_lib(name, author, is_read) {
-    my_library.push({ id: crypto.randomUUID(), book: new Book(name, author, is_read), });
+    const book = new Book(name, author, is_read);
+    my_library.push({ id: crypto.randomUUID(), ...book});
 }
 
 function print_books() {
@@ -28,7 +29,7 @@ function print_books() {
     const table = document.createElement("table");
     new_table_header(table);
     const tbody = document.createElement("tbody");
-    my_library.forEach((v) => new_book_row(tbody, { id: v.id, ...v.book }));
+    my_library.forEach((v) => new_book_row(tbody, v));
     table.appendChild(tbody);
     book_table_div.append(table);
 }
@@ -87,9 +88,15 @@ function init() {
         add_dialog.close();
     })
     book_table_div.addEventListener('click', (e) => {
-        if ([...e.target.classList].includes("btn-del")) {
+        target_classes = [...e.target.classList]
+        if (target_classes.includes("btn-del")) {
             const id = e.target.getAttribute("data-book-id");
             my_library.splice(my_library.findIndex((v) => v.id === id), 1);
+        }
+        else if(target_classes.includes("btn-is-read")) {
+            const id = e.target.getAttribute("data-book-id");
+            let book = my_library.find((v) => v.id === id);
+            book.is_read = ! book.is_read;
         }
     })
 }
