@@ -3,23 +3,26 @@ const form = document.querySelector("form.new-book");
 const add_dialog = document.querySelector("dialog.new-book");
 const book_table_div = document.querySelector(".book-table");
 
-function Book(name, author) {
+function Book(name, author, is_read) {
     if (!new.target) {
         throw Error("new not used");
     }
     this.name = name;
     this.author = author;
+    this.is_read = is_read;
 }
 
-const keys = ["id", "name", "author"];
+const keys = ["id", "name", "author", "is_read"];
+const btns = [{ label: "Delete", class: "btn-del" }, { label: "set is_read", class: "btn-is-read" }];
+const cols = keys.concat(btns.map((v) => v.label));
 
-function add_book_to_lib(name, author) {
-    my_library.push({ id: crypto.randomUUID(), book: new Book(name, author), });
+function add_book_to_lib(name, author, is_read) {
+    my_library.push({ id: crypto.randomUUID(), book: new Book(name, author, is_read), });
 }
 
 function print_books() {
     const old_table = document.querySelector(".book-table > table");
-    if(old_table) {
+    if (old_table) {
         book_table_div.removeChild(old_table);
     }
     const table = document.createElement("table");
@@ -32,7 +35,7 @@ function print_books() {
 
 function new_table_header(table) {
     const thead = document.createElement("thead");
-    keys.forEach((v) => {
+    cols.forEach((v) => {
         const th = document.createElement("th");
         th.textContent = v;
         thead.appendChild(th);
@@ -47,23 +50,25 @@ function new_book_row(tbody, book) {
         td.textContent = book[key];
         tr.appendChild(td);
     })
-    const td_del = document.createElement("td");
-    const btn_del = document.createElement("button");
-    btn_del.classList.add("btn-del");
-    btn_del.textContent = "DEL";
-    btn_del.setAttribute("data-book-id", book.id);
-    td_del.appendChild(btn_del);
-    tr.appendChild(td_del);
+    btns.forEach((btn_data) => {
+        const td = document.createElement("td");
+        const btn = document.createElement("button");
+        btn.classList.add(btn_data.class);
+        btn.textContent = btn_data.label;
+        btn.setAttribute("data-book-id", book.id);
+        td.appendChild(btn);
+        tr.appendChild(td);
+    })
 
     tbody.appendChild(tr);
 }
 
 function feed() {
-    add_book_to_lib("book1", "author1");
-    add_book_to_lib("book2", "author2");
-    add_book_to_lib("book3", "author3");
-    add_book_to_lib("book4", "author4");
-    add_book_to_lib("book5", "author5");
+    add_book_to_lib("book1", "author1", true);
+    add_book_to_lib("book2", "author2", false);
+    add_book_to_lib("book3", "author3", true);
+    add_book_to_lib("book4", "author4", true);
+    add_book_to_lib("book5", "author5", false);
 }
 
 
@@ -81,9 +86,8 @@ function init() {
         add_book_to_lib(data.get("name"), data.get("author"));
         add_dialog.close();
     })
-    book_table_div.addEventListener('click', (e)=> {
-        if([...e.target.classList].includes("btn-del"))
-        {
+    book_table_div.addEventListener('click', (e) => {
+        if ([...e.target.classList].includes("btn-del")) {
             const id = e.target.getAttribute("data-book-id");
             my_library.splice(my_library.findIndex((v) => v.id === id), 1);
         }
