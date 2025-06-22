@@ -6,14 +6,43 @@ const Library = (function () {
     return { books, add_form, add_dialog, book_table_div };
 })()
 
-function Book(name, author, is_read) {
-    if (!new.target) {
-        throw Error("new not used");
+class Book {
+    #name;
+    #author;
+    #is_read = false;
+    constructor(name, author, is_read){
+        this.#name = name;
+        this.#author = author;
+        this.#is_read = is_read;
     }
-    this.name = name;
-    this.author = author;
-    this.is_read = is_read;
+    get name() {
+        return this.#name;
+    }
+    set name(name) {
+        this.#name = name;
+    }
+    get author() {
+        return this.#author;
+    }
+    set author(author) {
+        this.#author = author;
+    }
+    get is_read() {
+        return this.#is_read;
+    }
+    set is_read(is_read) {
+        this.#name = is_read;
+    }
 }
+
+// function Book(name, author, is_read) {
+//     if (!new.target) {
+//         throw Error("new not used");
+//     }
+//     this.name = name;
+//     this.author = author;
+//     this.is_read = is_read;
+// }
 
 const Library_ui = (function () {
     const keys = ["id", "name", "author", "is_read"];
@@ -24,7 +53,7 @@ const Library_ui = (function () {
 
 function add_book_to_lib(name, author, is_read) {
     const book = new Book(name, author, is_read);
-    Library.books.push({ id: crypto.randomUUID(), ...book });
+    Library.books.push({ id: crypto.randomUUID(), name: book.name, author: book.author, is_read: book.is_read});
     print_books();
 }
 
