@@ -18,7 +18,8 @@ const cols = keys.concat(btns.map((v) => v.label));
 
 function add_book_to_lib(name, author, is_read) {
     const book = new Book(name, author, is_read);
-    my_library.push({ id: crypto.randomUUID(), ...book});
+    my_library.push({ id: crypto.randomUUID(), ...book });
+    print_books();
 }
 
 function print_books() {
@@ -92,11 +93,13 @@ function init() {
         if (target_classes.includes("btn-del")) {
             const id = e.target.getAttribute("data-book-id");
             my_library.splice(my_library.findIndex((v) => v.id === id), 1);
+            print_books();
         }
-        else if(target_classes.includes("btn-is-read")) {
+        else if (target_classes.includes("btn-is-read")) {
             const id = e.target.getAttribute("data-book-id");
             let book = my_library.find((v) => v.id === id);
-            book.is_read = ! book.is_read;
+            book.is_read = !book.is_read;
+            print_books();
         }
     })
 }
