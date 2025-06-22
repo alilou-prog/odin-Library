@@ -1,7 +1,10 @@
-const my_library = []
-const form = document.querySelector("form.new-book");
-const add_dialog = document.querySelector("dialog.new-book");
-const book_table_div = document.querySelector(".book-table");
+const Library = (function () {
+    const books = []
+    const add_form = document.querySelector("form.new-book");
+    const add_dialog = document.querySelector("dialog.new-book");
+    const book_table_div = document.querySelector(".book-table");
+    return { books, add_form, add_dialog, book_table_div };
+})()
 
 function Book(name, author, is_read) {
     if (!new.target) {
@@ -12,32 +15,35 @@ function Book(name, author, is_read) {
     this.is_read = is_read;
 }
 
-const keys = ["id", "name", "author", "is_read"];
-const btns = [{ label: "Delete", class: "btn-del" }, { label: "set is_read", class: "btn-is-read" }];
-const cols = keys.concat(btns.map((v) => v.label));
+const Library_ui = (function () {
+    const keys = ["id", "name", "author", "is_read"];
+    const btns = [{ label: "Delete", class: "btn-del" }, { label: "set is_read", class: "btn-is-read" }];
+    const cols = keys.concat(btns.map((v) => v.label));
+    return {keys, btns, cols};
+})()
 
 function add_book_to_lib(name, author, is_read) {
     const book = new Book(name, author, is_read);
-    my_library.push({ id: crypto.randomUUID(), ...book });
+    Library.books.push({ id: crypto.randomUUID(), ...book });
     print_books();
 }
 
 function print_books() {
     const old_table = document.querySelector(".book-table > table");
     if (old_table) {
-        book_table_div.removeChild(old_table);
+        Library.book_table_div.removeChild(old_table);
     }
     const table = document.createElement("table");
     new_table_header(table);
     const tbody = document.createElement("tbody");
-    my_library.forEach((v) => new_book_row(tbody, v));
+    Library.books.forEach((v) => new_book_row(tbody, v));
     table.appendChild(tbody);
-    book_table_div.append(table);
+    Library.book_table_div.append(table);
 }
 
 function new_table_header(table) {
     const thead = document.createElement("thead");
-    cols.forEach((v) => {
+    Library_ui.cols.forEach((v) => {
         const th = document.createElement("th");
         th.textContent = v;
         thead.appendChild(th);
@@ -52,7 +58,7 @@ function new_book_row(tbody, book) {
         td.textContent = book[key];
         tr.appendChild(td);
     })
-    btns.forEach((btn_data) => {
+    Library_ui.btns.forEach((btn_data) => {
         const td = document.createElement("td");
         const btn = document.createElement("button");
         btn.classList.add(btn_data.class);
@@ -80,24 +86,24 @@ function init() {
     print_btn.addEventListener("click", () => { print_books(); })
     const add_btn = document.querySelector("button.new-book");
     add_btn.addEventListener("click", () => {
-        add_dialog.showModal();
+        Library.add_dialog.showModal();
     })
-    form.addEventListener("submit", (e) => {
+    Library.add_form.addEventListener("submit", (e) => {
         e.preventDefault();
         const data = new FormData(e.target);
         add_book_to_lib(data.get("name"), data.get("author"));
-        add_dialog.close();
+        Library.add_dialog.close();
     })
-    book_table_div.addEventListener('click', (e) => {
+    Library.book_table_div.addEventListener('click', (e) => {
         target_classes = [...e.target.classList]
         if (target_classes.includes("btn-del")) {
             const id = e.target.getAttribute("data-book-id");
-            my_library.splice(my_library.findIndex((v) => v.id === id), 1);
+            Library.books.splice(Library.books.findIndex((v) => v.id === id), 1);
             print_books();
         }
         else if (target_classes.includes("btn-is-read")) {
             const id = e.target.getAttribute("data-book-id");
-            let book = my_library.find((v) => v.id === id);
+            let book = Library.books.find((v) => v.id === id);
             book.is_read = !book.is_read;
             print_books();
         }
